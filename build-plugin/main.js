@@ -71,6 +71,7 @@ module.exports = {
                     let celerx = Fs.readFileSync(Editor.url("packages://build-plugin/" + refPath + "celerx.js")).toString();
 
                     Fs.writeFileSync(url, mainjsStr.replace("PROJECT_JS_PATH", projectjsName).replace("$CELER_X_SDK_INIT_CONTENT$", celerx));
+                    Editor.success("inject celerx done...");
                 } catch (error) {
                     Editor.success("faild " + error);
                 }
