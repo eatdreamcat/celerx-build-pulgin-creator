@@ -27,132 +27,70 @@ window["celerSDK"] = {
 
   },
   surrender: function (arr) {
-    return bridge.call("surrender", binary_to_base64(arr));
+
   },
   applyAction: function (arr, callback) {
-    return bridge.call("applyAction", binary_to_base64(arr), callback);
+
   },
   getOnChainState: function (callback) {
-    return bridge.call("getOnChainState", "123", function (base64) {
-      var output = base64_decode(base64);
-      return callback(new Uint8Array(output));
-    });
+
   },
   getOnChainActionDeadline: function (callback) {
-    return bridge.call("getOnChainActionDeadline", "123", callback);
+
   },
   getCurrentBlockNumber: function () {
-    return bridge.call("getCurrentBlockNumber", "123");
+
   },
   finalizeOnChainGame: function (callback) {
-    return bridge.call("finalizeOnChainGame", "123", callback);
+
   },
   submitScore: function (score) {
-    return bridge.call("submitScore", score);
+    console.log("submit score:", e);
+    localStorage.removeItem('select-game');
+    localStorage.removeItem('in-game');
+    cc.game.restart();
   },
   ready: function () {
-    if (window.cc) {
-      var takeImage = false;
-      var canvas = document.getElementsByTagName("canvas")[0];
-      cc.director.on(cc.Director.EVENT_AFTER_DRAW, function () {
-        if (takeImage) {
-          takeImage = false;
-          celerSDK.didTakeSnapshot(canvas.toDataURL("image/jpeg", 0.1));
-        }
-      });
-      celerSDK.provideCurrentFrameData(function () {
-        takeImage = true;
-      });
+    if (sdkBridge && sdkBridge.ready) {
+      sdkBridge.ready();
     }
-    return bridge.call("ready");
+
   },
   onStart: function (callback) {
-    return bridge.register("onStart", callback);
+    if (sdkBridge) {
+      sdkBridge.start = callback;
+    }
   },
+
   provideScore: function (callback) {
-    return (provideScore = {
-      callback: callback
-    });
+    if (sdkBridge) {
+      sdkBridge.getGameScore = callback;
+    }
   },
   provideCurrentFrameData: function (callback) {
-    return (provideCurrentFrameData = {
-      callback: callback
-    });
+
   },
   didTakeSnapshot: function (e) {
-    if (
-      window["webkit"] &&
-      window["webkit"].messageHandlers &&
-      window["webkit"].messageHandlers["celerSDK"] &&
-      window["webkit"].messageHandlers["celerSDK"].postMessage
-    ) {
-      window["webkit"].messageHandlers["celerSDK"].postMessage({
-        method: "didTakeSnapshot",
-        args: e,
-      });
-    } else {
-      return bridge.call("didTakeSnapshot", e);
-    }
+
   },
   log: function (e) {
-    if (
-      window["webkit"] &&
-      window["webkit"].messageHandlers &&
-      window["webkit"].messageHandlers["celerSDK"] &&
-      window.webkit.messageHandlers["celerSDK"].postMessage
-    ) {
-      window.webkit.messageHandlers["celerSDK"].postMessage({
-        method: "log",
-        args: e,
-      });
-    } else {
-      return bridge.call("log", e);
+    if (sdkBridge && sdkBridge.addLog) {
+      sdkBridge.addLog(e);
     }
   },
-  getGameScore: function () {
-    if (
-      !provideScore ||
-      !provideScore.callback ||
-      provideScore.callback() == ""
-    ) {
-      return 0;
-    }
-    return provideScore.callback();
-  },
-  switchSnapShotFlag: function () {
-    if (
-      !provideCurrentFrameData ||
-      !provideCurrentFrameData.callback ||
-      provideCurrentFrameData.callback() == ""
-    ) {
-      return 0;
-    }
-    return provideCurrentFrameData.callback();
-  },
+
   onResume: function (callback) {
 
-    return (onResume = {
-      callback: callback
-    });
+    if (sdkBridge) {
+      sdkBridge.resume = callback
+    }
+
   },
   onPause: function (callback) {
 
-    return (onPause = {
-      callback: callback
-    });
-  },
-  triggerOnResumeInGame: function () {
-
-    if (!onResume || !onResume.callback || onResume.callback() == "") {
-      return 0;
+    if (sdkBridge) {
+      sdkBridge.pause = callback
     }
-    return onResume.callback();
-  },
-  triggerOnPauseInGame: function () {
 
-    if (!onPause || !onPause.callback || onPause.callback() == "") {
-      return 0;
-    }
-    return onPause.callback();
-  },
+  }
 };

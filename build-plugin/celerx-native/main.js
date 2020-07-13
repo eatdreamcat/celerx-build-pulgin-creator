@@ -54,9 +54,11 @@
                 jsb.fileUtils.removeDirectory(tempPath);
             }
         }
+
+        console.log(jsb.fileUtils.getSearchPaths())
     }
 
-    console.log(jsb.fileUtils.getSearchPaths())
+
 })();
 // QQPlay window need to be inited first
 if (false) {
